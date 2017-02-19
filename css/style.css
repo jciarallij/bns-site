@@ -1,0 +1,401 @@
+/* Some CSS Setup - nothing to do with flexbox */
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+.container {
+  padding: 0;
+}
+
+.row {
+  margin: 0;
+}
+
+body {
+  font-family: Helvetica, sans-serif;
+  margin: 0;
+  /*background-image: linear-gradient(260deg, #2376ae 0%, #c16ecf 100%);*/
+  background-color: #232323;
+}
+
+.toggleNav {
+  display: none;
+}
+
+a {
+  color: #00D9BC;;
+}
+
+footer {
+  background: #2B2B2B;
+  min-height: 100px;
+  border-bottom: 5px solid rgba(0, 145, 125, 1);
+  color: #00D9BC;
+  font-size: 16px;
+}
+
+.button {
+  border: none;
+  outline: none;
+  border-radius: 2rem;
+  padding: .9rem 3.5rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+.highlight {
+  color: #00d9bc;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 0px;
+}
+
+
+.content-services {
+  background: #434343;
+  height: 520px;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px 0;
+  color: white;
+  font-size: 18px;
+}
+
+.services-info {
+  background: #434343;
+  height: auto;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px 0;
+  color: white;
+  font-size: 18px;
+}
+
+.contact-info {
+  background: #434343;
+  min-height: 200px;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 20px 0;
+  color: white;
+  font-size: 14px;
+}
+
+a.email-link:hover, a.phone-link:hover {
+  color: #FFFFFF;
+  background: none;
+}
+
+
+
+.main-text-content {
+  min-height: 300px;
+  background: #434343;
+  padding: 10px;
+  margin: -20px 0 20px 0px;
+  border-radius: 5px;
+  color: white;
+  font-size: 20px;
+}
+
+.button_highlight {
+  background: #00d9bc;
+}
+
+.button_secondary {
+  background: rgba(250, 250, 250, 0.35);
+}
+
+#banner {
+  background-image: url('../images/background-meeting-1.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#banner header {
+  padding: 2rem 0;
+}
+
+#banner #logo {
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 1.35rem;
+  float: left;
+  margin: 0;
+}
+
+.content {
+  padding: 12rem 0 10rem 0;
+}
+
+.content .title, .content .sub_title {
+  /*color: rgba(0, 217, 188, 0.71);*/
+  color: #FFFFFF;
+  color: #00d9bc;
+  text-align: center;
+  text-shadow: 0 2px 3px rgba(51, 51, 51, 0.71), 0 -1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.content .title {
+  font-size: 6.5rem;
+  margin: 0;
+}
+
+.content .sub_title {
+  font-weight: 400;
+  font-size: 2.35rem;
+  line-height: 1.75;
+}
+
+.content .button_wrapper {
+  text-align: center;
+  margin: 10rem 0;
+}
+
+.content .button_wrapper .button {
+  margin: 0 .75rem;
+}
+
+
+
+#temp-color-samples {
+  color: #FFFFFF;  /* White */
+  color: #7ac483;  /* Highlight */
+  color: #f2f1f8;  /* Grey Background */
+  color: #b9b7c6;  /* Grey Copy */
+  color: #3f3d4e;  /* Dark Grey */
+  color: #FFFFFF;  /* Green */
+  color: #00917d;  /* Site Main Theme Color */
+  color: #00d9bc;  /* Hover Color */
+}
+
+nav a {
+  color:white;
+  font-weight: 100;
+  letter-spacing: 2px;
+  text-decoration: none;
+  background:rgba(0,0,0,0.2);
+  padding:20px 5px;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  transition:all 0.5s;
+}
+
+a:hover {
+  background:rgba(0,0,0,0.3);
+  text-decoration: none;
+  color: #00d9bc;
+}
+
+a:active, a:focus {
+  text-decoration: none;
+  color: #00917d;
+}
+
+#site-wrapper {
+  background-color: #00917d;
+}
+
+/*.main-section {
+    background: url('images/background-meeting.jpg') no-repeat;
+    background-size: 100%;
+    height: 700px;
+}*/
+
+.custom-btn {
+  background: #00d9bc;
+  border-radius: : 10px;
+  border-color: none;
+}
+
+
+/* Flex Container */
+.flex-nav ul {
+  /*border:1px solid black;*/
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  box-shadow: 0 2px 1px -2px #00917d;
+}
+
+.flex-nav li {
+  flex: 3;
+}
+
+.flex-nav .social {
+  flex: 1;
+}
+
+.plan ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan ul li {
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  padding:10px;
+}
+
+.plan ul li:last-child {
+  border-bottom: 0;
+}
+
+.plan a {
+  text-decoration: none;
+  background: #00d9bc;
+  padding:10px;
+  color:black;
+  border-radius:4px;
+}
+
+.mobile-logo {
+  display: none;
+}
+
+
+.plan h2 {
+  text-transform: uppercase;
+  color:white;
+  letter-spacing: 2px;
+  text-shadow:3px 3px 0 rgba(0,0,0,0.1);
+}
+
+.price {
+  font-size: 50px;
+  font-family: serif;
+  margin: 10px 0;
+}
+
+/* Flex Container */
+.pricing-grid {
+  max-width:750px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.plan {
+  flex: 1;
+  background: lightgray;
+  margin: 20px;
+  border-radius: 4px;
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.plan .cta {
+  align-self: flex-end;
+}
+
+.plan > * {
+  flex: 1;
+  flex-basis: 100%;
+}
+
+
+.flex-form input[type="submit"] {
+  background:#00d9bc;
+  border-top: 1px solid #00d9bc;
+  border-bottom: 1px solid #00d9bc;
+  color:white;
+}
+
+.flex-form > * {
+  border:0;
+  padding:10px;
+  background:white;
+  line-height:50px;
+  font-size: 20px;
+  border-radius:0;
+  outline:0;
+  border-right:1px solid rgba(0,0,0,0.2);
+  -webkit-appearance:none;
+}
+
+.flex-form > *:last-child {
+  border-right: 0;
+}
+
+.flex-form {
+  z-index: 10;
+  border:20px solid rgba(0,0,0,0.3);
+  border-radius:5px;
+  display:flex;
+}
+
+input[type="email"] {
+  flex: 2;
+}
+
+input[type="text"] {
+  flex: 1;
+}
+
+ul.my-list li{
+  padding-bottom: 10px;
+}
+
+.contact-info {
+  min-height: 340px;
+}
+
+@media all and (max-width:1000px) {
+
+.flex-nav ul {
+  flex-wrap: wrap;
+}
+
+.flex-nav li {
+  flex:1 1 50%;
+}
+
+.flex-nav .social {
+  flex: 1 1 25%;
+}
+
+
+
+}
+
+@media all and (max-width:500px) {
+
+.flex-nav li {
+  flex-basis: 100%;
+}
+
+.toggleNav {
+  display: block;
+}
+
+.flex-nav ul {
+  display: none;
+}
+.flex-nav ul.open {
+  display:flex;
+}
+
+img.main-logo {
+  display: none;
+}
+
+.mobile-logo {
+  display: block;
+  float: left;
+  margin: 0;
+  padding: 0;
+  left: 10px;
+  top: 10px;
+  position: absolute;
+}
+
+}
