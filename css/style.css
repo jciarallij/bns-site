@@ -58,7 +58,7 @@ footer {
 
 .content-services {
   background: #434343;
-  height: 520px;
+  min-height: 520px;
   border-radius: 5px;
   padding: 10px;
   margin: 20px 0;
