@@ -147,6 +147,7 @@ a.email-link:hover, a.phone-link:hover {
   text-shadow: 0 2px 3px rgba(51, 51, 51, 0.71), 0 -1px 2px rgba(0, 0, 0, 0.2);
   font-size: 6.5rem;
   margin: 0;
+  padding-bottom: 40px;
 }
 
 .author {
@@ -377,6 +378,8 @@ ul.my-list li{
 
 
 
+
+
 }
 
 @media all and (max-width:500px) {
@@ -408,6 +411,11 @@ img.main-logo {
   left: 10px;
   top: 10px;
   position: absolute;
+}
+
+.title-blog {
+  font-size: 4.5rem;
+  text-align: center;
 }
 
 }
