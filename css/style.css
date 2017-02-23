@@ -55,6 +55,12 @@ footer {
   margin-top: 0px;
 }
 
+.highlight-services {
+  color: #00d9bc;
+  text-align: center;
+  margin-top: 0px;
+}
+
 
 .content-services {
   background: #434343;
@@ -68,7 +74,7 @@ footer {
 
 .services-info {
   background: #434343;
-  height: auto;
+  min-height: 350px;
   border-radius: 5px;
   padding: 10px;
   margin: 20px 0;
