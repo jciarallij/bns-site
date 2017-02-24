@@ -107,6 +107,7 @@ a.email-link:hover, a.phone-link:hover {
   border-radius: 5px;
   color: white;
   font-size: 20px;
+  margin-bottom: 50px;
 }
 
 .button_highlight {
