@@ -5,7 +5,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var passport = require('passport');
+var RedisStore = require('connect-redis')(session);
 var db = require('./db');
+var cache = require('./cache');
 require('./passport');
 
 var authRoutes = require('./routes/auth');
@@ -22,7 +24,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({ secret: 'josh is awesome', resave: false, saveUninitialized: false }));
+app.use(session({
+	store: new RedisStore(),
+	secret: 'josh is awesome',
+	resave: false,
+	saveUninitialized: false
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(authRoutes);
