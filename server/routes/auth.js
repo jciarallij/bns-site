@@ -13,7 +13,7 @@ router
 		res.render('login');
 	})
 	.post('/login', passport.authenticate('local', {
-		successRedirect: '/posts',
+		successRedirect: '/blogs',
 		failureRedirect: '/login'
 	}))
 	.get('/logout', (req, res, next) => {
@@ -21,12 +21,12 @@ router
 			res.redirect('/login');
 		});
 	})
-	.get('/signup', (req, res, next) => {
-		res.render('signup');
+	.get('/register', (req, res, next) => {
+		res.render('register');
 	})
-	.post('/signup', passport.authenticate('local-register', {
-		successRedirect: '/posts',
-		failureRedirect: '/signup'
+	.post('/register', passport.authenticate('local-register', {
+		successRedirect: '/blogs',
+		failureRedirect: '/register'
 	}));
 // 	.get('/auth/github',
 //   passport.authenticate('github', { scope: ['user:email'] }))
