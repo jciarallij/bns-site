@@ -2,29 +2,38 @@ const passport = require('passport');
 const router = require('express').Router();
 
 router
-	.get('/login', (req, res, next) => {
-		res.send(req.isAuthenticated() ? req.user : '0');
-	})
-	.post('/login', passport.authenticate('local'), (req, res) => {
-		res.json(req.user);
-	})
-	.get('/logout', (req, res, next) => {
-		req.session.destroy(err => {
-			res.sendStatus(200);
+	.get('/', (req, res, next) => {
+		res.send({
+			session: req.session,
+			user: req.user,
+			authenticated: req.isAuthenticated(),
 		});
 	})
-	.get('/register', (req, res, next) => {
-		res.send(req.isAuthenticated() ? req.user : '0');
+	.get('/login', (req, res, next) => {
+		res.render('login');
 	})
-	.post('/register', passport.authenticate('local-register'),  (req, res) => {
-		res.json(req.user);
-	});
-	// .get('/auth/github',
- //  passport.authenticate('github', { scope: ['user:email'] }))
-	// .get('/auth/github/callback',
- //  passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
- //    // Successful authentication, redirect home.
-	// res.redirect('/');
-	// });
+	.post('/login', passport.authenticate('local', {
+		successRedirect: '/posts',
+		failureRedirect: '/login'
+	}))
+	.get('/logout', (req, res, next) => {
+		req.session.destroy(err => {
+			res.redirect('/login');
+		});
+	})
+	.get('/signup', (req, res, next) => {
+		res.render('signup');
+	})
+	.post('/signup', passport.authenticate('local-register', {
+		successRedirect: '/posts',
+		failureRedirect: '/signup'
+	}));
+// 	.get('/auth/github',
+//   passport.authenticate('github', { scope: ['user:email'] }))
+// 	.get('/auth/github/callback',
+//   passport.authenticate('github', { failureRedirect: '/login' }), (req, res) => {
+//     // Successful authentication, redirect home.
+// 	res.redirect('/');
+// });
 
 module.exports = router;

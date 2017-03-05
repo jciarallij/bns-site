@@ -1,26 +1,22 @@
-const express = require('express');
-const path = require('path');
-const logger = require('morgan');
-const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
-const session = require('express-session');
-const RedisStore = require('connect-redis')(session);
-const passport = require('passport');
-const config = require('./config')[process.env.NODE_ENV || 'development'];
-const cache = require('./cache');
-const db = require('./db');
+var express = require('express');
+var path = require('path');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var session = require('express-session');
+var passport = require('passport');
+var db = require('./db');
 require('./passport');
 
-const authRoutes = require('./routes/auth');
-const postsRoutes = require('./routes/posts');
+var authRoutes = require('./routes/auth');
+var postsRoutes = require('./routes/posts');
 
-const app = express();
+var app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hjs');
 
-// middleware
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -31,14 +27,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(authRoutes);
 app.use(postsRoutes);
-
-app.get('/', (req, res, next) => {
-	res.send({
-		session: req.session,
-		user: req.user,
-		authenticated: req.isAuthenticated(),
-	});
-});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

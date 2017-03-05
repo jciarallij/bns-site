@@ -2,38 +2,37 @@ const bcrypt = require('bcrypt-nodejs');
 const db = require('./db');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-// const GitHubStrategy = require('passport-github').Strategy;
 
-function authenticate(user_name, password, done) {
+function authenticate(username, password, done) {
 	db('users')
-	.where('user_name', user_name)
+	.where('userName', username)
 	.first()
 	.then(user => {
 		if (!user || !bcrypt.compareSync(password, user.password)) {
-			return done(null, false, { message: 'Invalid username and password combination' });
+			return done(null, false, { message: 'invalid user and password combination' });
 		}
 		done(null, user);
 	}, done);
 }
 
-function register(req, user_name, password, done) {
+function register(req, username, password, done) {
 	db('users')
-	.where('user_name', user_name)
+	.where('userName', username)
 	.first()
 	.then(user => {
 		if (user) {
-			return done(null, false, { message: `Sorry, username "${user_name}" already exists` });
+			return done(null, false, { message: `Sorry, username "${username}" already exists` });
 		}
 		if (password !== req.body.password2) {
 			return done(null, false, { message: 'Sorry, passwords don\'t match' });
 		}
 		const newUser = {
-			user_name: req.body.user_name,
-			first_name: req.body.first_name,
-			last_name: req.body.last_name,
+			userName: username,
+			firstName: req.body.firstName,
+			lastName: req.body.lastName,
 			email: req.body.email,
-			is_admin: 0,
-			is_staff: 0,
+			isAdmin: 0,
+			isStaff: 0,
 			password: bcrypt.hashSync(password)
 		};
 		db('users')
@@ -51,7 +50,7 @@ passport.use('local-register', new LocalStrategy({ passReqToCallback: true }, re
 // 	// Need to protect these keys
 // 	clientID: '',
 // 	clientSecret: '',
-// 	callbackURL: 'http://localhost:3000/auth/github/callback'
+// 	callbackURL: 'http://localhost:3021/auth/github/callback'
 // }, (accessToken, refreshToken, profile, done) => {
 // 	db('users')
 // 		.where('oauth_provider', 'github')
