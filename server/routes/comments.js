@@ -54,5 +54,9 @@ router
 				res.send(newComment);
 			}, next);
 	});
+// to-do: editComments
+// to-do: deleteComments
+// to-do: approveComments
+
 
 module.exports = router;
