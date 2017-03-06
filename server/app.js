@@ -12,6 +12,7 @@ require('./passport');
 
 var authRoutes = require('./routes/auth');
 var blogsRoutes = require('./routes/blogs');
+var commentsRoutes = require('./routes/comments');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(authRoutes);
 app.use(blogsRoutes);
+app.use(commentsRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

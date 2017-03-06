@@ -24,22 +24,35 @@ function adminRequired(req, res, next) {
 }
 
 router
-	.get('/comments/:id', (req, res, next) => {
-		const { id } = req.params;
-		db('blogs')
-			.where('id', id)
-			.first()
-			.then(blog => {
-				if (!blog) {
-					return res.send({ message: 'Sorry unable to retrieve comments' });
+	.get('/comments/:blogId', loginRequired, (req, res, next) => {
+		const { blogId } = req.params;
+		db('comments')
+			.where('blogId', blogId)
+			.then(comments => {
+				if (!comments) {
+					return res.send({ message: `Sorry unable to retrieve any comments for blog: ${blogId}.` });
 				}
-				res.send(blog.comments);
+				res.send(comments);
 			}, next);
 	})
-	.post('/comments/:id', loginRequired, (req, res, next) => {
-		const { id } = req.params;
+	.post('/addComment', loginRequired, (req, res, next) => {
+// To-do: add check to make sure blogId exists
+		const newComment = {
+// delete this seed data for username
+			createdBy: 'Tlobaugh',
+			// createdBy: req.user.userName,
+			blogId: req.body.blogId,
+			body: req.body.body
+		};
 		db('comments')
-			.where('id', id)
-// how to update the array???
-			.update(req.body.comments);
+			.insert(newComment)
+			.then(comments => {
+				if (!comments) {
+					return res.send({ message: 'Error...Couldn\'t post your comment' });
+				}
+				newComment.id = comments[0];
+				res.send(newComment);
+			}, next);
 	});
+
+module.exports = router;

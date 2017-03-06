@@ -31,7 +31,7 @@ router.get('/blogs', loginRequired, (req, res, next) => {
 });
 
 router
-	.post('/addBlog', (req, res, next) => {
+	.post('/addBlog', loginRequired, adminRequired, (req, res, next) => {
 		db('blogs')
 			.where('title', req.body.title)
 			.first()
@@ -42,15 +42,11 @@ router
 			}, next);
 		const newBlog = {
 			title: req.body.title,
-			text: req.body.text,
-// how to set up date in mysql
-			date: '3/4/17',
-			hasEdit: 0,
+			body: req.body.body,
 		};
 		db('blogs')
 			.insert(newBlog)
 			.then(blogIds => {
-				console.log('testing');
 				if (!blogIds) {
 					return res.send({ message: 'Error...Couldn\'t post blog' });
 				}
@@ -61,7 +57,6 @@ router
 	.put('/editBlog/:id', loginRequired, adminRequired, (req, res, next) => {
 		const { id } = req.params;
 		req.body.hasEdit = 1;
-		req.body.editDate = new Date();
 		db('blogs')
 			.where('id', id)
 			.update(req.body)
@@ -72,7 +67,7 @@ router
 				res.sendStatus(200);
 			}, next);
 	})
-	.delete('deleteBlog/:id', loginRequired, adminRequired, (req, res, next) => {
+	.delete('/deleteBlog/:id', loginRequired, adminRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('blogs')
 			.where('id', id)

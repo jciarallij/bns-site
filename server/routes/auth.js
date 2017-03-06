@@ -1,6 +1,13 @@
 const passport = require('passport');
 const router = require('express').Router();
 
+function isLoggedIn(req, res, next) {
+	if (req.isAuthenticated()) {
+		return res.redirect('/blogs');
+	}
+	next();
+}
+
 router
 	.get('/', (req, res, next) => {
 		res.send({
@@ -9,7 +16,7 @@ router
 			authenticated: req.isAuthenticated(),
 		});
 	})
-	.get('/login', (req, res, next) => {
+	.get('/login', isLoggedIn, (req, res, next) => {
 		res.render('login');
 	})
 	.post('/login', passport.authenticate('local', {
@@ -21,7 +28,7 @@ router
 			res.redirect('/login');
 		});
 	})
-	.get('/register', (req, res, next) => {
+	.get('/register', isLoggedIn, (req, res, next) => {
 		res.render('register');
 	})
 	.post('/register', passport.authenticate('local-register', {
