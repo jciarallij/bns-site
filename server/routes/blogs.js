@@ -23,14 +23,14 @@ function adminRequired(req, res, next) {
 	next();
 }
 
-router.get('/blogs', loginRequired, (req, res, next) => {
-	db('blogs')
-		.then(blogs => {
-			res.send(blogs);
-		});
-});
-
+// To-do - get all blogs? get last x blogs? get blog by id???
 router
+	.get('/blogs', loginRequired, (req, res, next) => {
+		db('blogs')
+			.then(blogs => {
+				res.send(blogs);
+			});
+	})
 	.post('/addBlog', loginRequired, adminRequired, (req, res, next) => {
 		db('blogs')
 			.where('title', req.body.title)
