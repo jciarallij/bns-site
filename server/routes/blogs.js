@@ -41,21 +41,38 @@ router
 			});
 	})
 
-// Get full individual blog by id
+// Get full individual blog by id WITH JOIN
+	// .get('/blog/:id', loginRequired, (req, res, next) => {
+	// 	const { id } = req.params;
+	// 	db('blogs')
+	// 		.leftJoin('comments', 'blogs.title', 'comments.blogTitle')
+	// 		.where('blogs.id', id)
+	// 		.then(blog => {
+	// 			if (!blog) {
+	// 				return res.send({ message: `Sorry blog ${id} couldn't be found` });
+	// 			}
+	// 			res.send(blog);
+	// 		}, next);
+	// })
+
+// Get full individual blog and comments by id WITHOUT JOIN
 	.get('/blog/:id', loginRequired, (req, res, next) => {
 		const { id } = req.params;
-// TO-DO - Write a join to include comments by blogTitle and Title
 		db('blogs')
-			.leftJoin('comments', 'blogs.title', 'comments.blogTitle')
-			.where('blogs.id', id)
-		// db('blogs')
-		// 	.where('id', id)
-		// 	.first()
+			.where('id', id)
+			.first()
 			.then(blog => {
 				if (!blog) {
 					return res.send({ message: `Sorry blog ${id} couldn't be found` });
 				}
-				res.send(blog);
+				db('comments')
+					.where('blogTitle', blog.title)
+					.then(comments => {
+						if (!comments) {
+							return res.send({ message: 'Sorry unable to get comments' });
+						}
+						res.send({ blog, comments });
+					}, next);
 			}, next);
 	})
 
