@@ -23,21 +23,27 @@ function adminRequired(req, res, next) {
 	next();
 }
 
+function authRequired(req, res, next) {
+	if (!(req.user.userName === req.body.createdBy) || !req.user.isStaff) {
+		return res.render('403');
+	}
+	next();
+}
+
 router
-// To-do - need to make an approved comments and non approved comments endpoint???
-// get comments by blogId
-	.get('/comments/:blogId', loginRequired, (req, res, next) => {
-		const { blogId } = req.params;
+// Get all comments that have not been apporved
+	.get('/unapprovedComments', loginRequired, staffRequired, (req, res, next) => {
 		db('comments')
-			.where('blogId', blogId)
+			.where('isApproved', 0)
 			.then(comments => {
 				if (!comments) {
-					return res.send({ message: `Sorry unable to retrieve any comments for blog: ${blogId}.` });
+					return res.send({ message: 'Sorry unable to retrieve any comments' });
 				}
 				res.send(comments);
 			}, next);
 	})
-// approveComments
+
+// Get to approve comment by id
 	.get('/approveComment/:id', loginRequired, staffRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('comments')
@@ -50,14 +56,28 @@ router
 				res.sendStatus(200);
 			}, next);
 	})
-// post comments
+
+// Get for liking comment by id
+	.get('/likeComment/:id', loginRequired, (req, res, next) => {
+		const { id } = req.params;
+		db('comments')
+			.where('id', id)
+			.increment('likes', 1)
+			.then(result => {
+				if (result === 0) {
+					return res.send({ message: 'Sorry unable to like comment' });
+				}
+				res.sendStatus(200);
+			}, next);
+	})
+
+// Post comment for a blog
 	.post('/addComment', loginRequired, (req, res, next) => {
-// To-do - add check to make sure blogId exists??? - NO
 		const newComment = {
 	// DELETE THIS SEED DATA FOR userName
 			createdBy: 'Tlobaugh',
 			// createdBy: req.user.userName,
-			blogId: req.body.blogId,
+			blogTitle: req.body.blogTitle,
 			body: req.body.body
 		};
 		if (req.user.isStaff) {
@@ -73,31 +93,29 @@ router
 				res.send(newComment);
 			}, next);
 	})
-// edit comments
-	.put('/editComment/:id', loginRequired, (req, res, next) => {
+
+// Put to edit comment by id, user can edit own comments and staff and edit all comments
+	.put('/editComment/:id', loginRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		req.body.hasEdit = 1;
-// To-do - Create function for authorization???
-// To-do - Get the createdBy from the database and not the req.body??
-		if (req.user.userName === req.body.createdBy || req.user.isAdmin) {
-			if (req.user.isStaff) {
-				req.body.isAllowed = 1;
-			}
-			db('comments')
-				.where('id', id)
-				.update(req.body)
-				.then(result => {
-					if (result === 0) {
-						return res.send({ message: 'Sorry unable to edit blog' });
-					}
-					res.sendStatus(200);
-				}, next);
+		if (req.user.isStaff) {
+			req.body.isAllowed = 1;
 		} else {
-			return res.render('403');
+			req.body.isAllowed = 0;
 		}
+		db('comments')
+			.where('id', id)
+			.update(req.body)
+			.then(result => {
+				if (result === 0) {
+					return res.send({ message: 'Sorry unable to edit blog' });
+				}
+				res.sendStatus(200);
+			}, next);
 	})
-// deleteComments
-	.delete('/deleteComment/:id', loginRequired, staffRequired, (req, res, next) => {
+
+// Delete to delete comment by ID user can delete own comments and staff and delete all comments
+	.delete('/deleteComment/:id', loginRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('comments')
 			.where('id', id)
@@ -109,6 +127,5 @@ router
 				res.sendStatus(200);
 			}, next);
 	});
-// To-do Create inital end-point called api
 
 module.exports = router;

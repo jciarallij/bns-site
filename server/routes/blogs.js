@@ -23,19 +23,57 @@ function adminRequired(req, res, next) {
 	next();
 }
 
-// To-do - get all blogs? get last x blogs? get blog by id???
+function authRequired(req, res, next) {
+	if (!(req.user.userName === req.body.createdBy) || !req.user.isAdmin) {
+		return res.render('403');
+	}
+	next();
+}
+
 router
+// Get all blogs with Title, Description, Ceated By, Created Date and Likes
 	.get('/blogs', loginRequired, (req, res, next) => {
-		db('blogs')
+		db
+			.select('title', 'description', 'createdBy', 'createdAt', 'likes')
+			.from('blogs')
 			.then(blogs => {
-// To-do only send Title, img, description, created date, likes
-// To-do add likes and description to DB
 				res.send(blogs);
 			});
 	})
-// To-do - .get for individual blog send all
-// To-do - .get for approving blogs
-// To-do - allow for staff to create blogs
+
+// Get full individual blog by id
+	.get('/blog/:id', loginRequired, (req, res, next) => {
+		const { id } = req.params;
+// TO-DO - Write a join to include comments by blogTitle and Title
+		db('blogs')
+			.leftJoin('comments', 'blogs.title', 'comments.blogTitle')
+			.where('blogs.id', id)
+		// db('blogs')
+		// 	.where('id', id)
+		// 	.first()
+			.then(blog => {
+				if (!blog) {
+					return res.send({ message: `Sorry blog ${id} couldn't be found` });
+				}
+				res.send(blog);
+			}, next);
+	})
+
+// Get for liking blog
+	.get('/likeBlog/:id', loginRequired, (req, res, next) => {
+		const { id } = req.params;
+		db('blogs')
+			.where('id', id)
+			.increment('likes', 1)
+			.then(result => {
+				if (result === 0) {
+					return res.send({ message: 'Sorry unable to like blog' });
+				}
+				res.sendStatus(200);
+			}, next);
+	})
+
+// Post for adding blogs by the Admin or Staff
 	.post('/addBlog', loginRequired, staffRequired, (req, res, next) => {
 		db('blogs')
 			.where('title', req.body.title)
@@ -46,9 +84,14 @@ router
 				}
 			}, next);
 		const newBlog = {
+			createdBy: req.user.userName,
 			title: req.body.title,
+			description: req.body.description,
 			body: req.body.body,
 		};
+		if (req.user.isAdmin) {
+			newBlog.isAllowed = 1;
+		}
 		db('blogs')
 			.insert(newBlog)
 			.then(blogIds => {
@@ -59,8 +102,9 @@ router
 				res.send(newBlog);
 			}, next);
 	})
-// To-do make so staff blog is editiable
-	.put('/editBlog/:id', loginRequired, adminRequired, (req, res, next) => {
+
+// Put for editing blog, Staff can only edit their own blogs and Admin can edit all
+	.put('/editBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		req.body.hasEdit = 1;
 		db('blogs')
@@ -73,7 +117,9 @@ router
 				res.sendStatus(200);
 			}, next);
 	})
-	.delete('/deleteBlog/:id', loginRequired, adminRequired, (req, res, next) => {
+
+// Delete to delete blogs, Staff can oly delete their own blogs and Admin can delete all.
+	.delete('/deleteBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('blogs')
 			.where('id', id)

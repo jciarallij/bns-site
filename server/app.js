@@ -33,9 +33,9 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(authRoutes);
-app.use(blogsRoutes);
-app.use(commentsRoutes);
+app.use('/api', authRoutes);
+app.use('/api', blogsRoutes);
+app.use('/api', commentsRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
