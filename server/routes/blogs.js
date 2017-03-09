@@ -28,10 +28,15 @@ router
 	.get('/blogs', loginRequired, (req, res, next) => {
 		db('blogs')
 			.then(blogs => {
+// To-do only send Title, img, description, created date, likes
+// To-do add likes and description to DB
 				res.send(blogs);
 			});
 	})
-	.post('/addBlog', loginRequired, adminRequired, (req, res, next) => {
+// To-do - .get for individual blog send all
+// To-do - .get for approving blogs
+// To-do - allow for staff to create blogs
+	.post('/addBlog', loginRequired, staffRequired, (req, res, next) => {
 		db('blogs')
 			.where('title', req.body.title)
 			.first()
@@ -54,6 +59,7 @@ router
 				res.send(newBlog);
 			}, next);
 	})
+// To-do make so staff blog is editiable
 	.put('/editBlog/:id', loginRequired, adminRequired, (req, res, next) => {
 		const { id } = req.params;
 		req.body.hasEdit = 1;

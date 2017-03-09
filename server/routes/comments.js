@@ -52,7 +52,7 @@ router
 	})
 // post comments
 	.post('/addComment', loginRequired, (req, res, next) => {
-// To-do - add check to make sure blogId exists???
+// To-do - add check to make sure blogId exists??? - NO
 		const newComment = {
 	// DELETE THIS SEED DATA FOR userName
 			createdBy: 'Tlobaugh',
@@ -60,7 +60,7 @@ router
 			blogId: req.body.blogId,
 			body: req.body.body
 		};
-		if (req.user.isAdmin) {
+		if (req.user.isStaff) {
 			newComment.isAllowed = 1;
 		}
 		db('comments')
@@ -80,7 +80,7 @@ router
 // To-do - Create function for authorization???
 // To-do - Get the createdBy from the database and not the req.body??
 		if (req.user.userName === req.body.createdBy || req.user.isAdmin) {
-			if (req.user.isAdmin) {
+			if (req.user.isStaff) {
 				req.body.isAllowed = 1;
 			}
 			db('comments')
@@ -104,11 +104,11 @@ router
 			.delete()
 			.then(result => {
 				if (result === 0) {
-					return res.send({ message: 'Sorry unable to delete commnet' });
+					return res.send({ message: 'Sorry unable to delete comment' });
 				}
 				res.sendStatus(200);
 			}, next);
 	});
-
+// To-do Create inital end-point called api
 
 module.exports = router;
