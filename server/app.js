@@ -30,21 +30,8 @@ app.set('view engine', 'hjs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
-	store: new RedisStore(),
-	secret: 'josh is awesome',
-	resave: false,
-	saveUninitialized: false
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use('/api', authRoutes);
-app.use('/api', blogsRoutes);
-app.use('/api', commentsRoutes);
 
-// Validator
+// Validator (needs to be directly after bodyParser)
 app.use(expressValidator({
 	errorFormatter(param, msg, value) {
 		var namespace = param.split('.');
@@ -67,6 +54,24 @@ app.use(function (req, res, next) {
 	res.locals.messages = expressMessages(req, res);
 	next();
 });
+
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Handle sessions and cacheing
+app.use(session({
+	store: new RedisStore(),
+	secret: 'josh is awesome',
+	resave: false,
+	saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
+app.use('/api', authRoutes);
+app.use('/api', blogsRoutes);
+app.use('/api', commentsRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

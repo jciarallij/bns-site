@@ -3,7 +3,18 @@ const db = require('./db');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-function authenticate(username, password, done) {
+function authenticate(req, username, password, done) {
+// Form Validator
+	req.checkBody('username', 'Username field is required').notEmpty();
+	req.checkBody('password', 'Password field is required').notEmpty();
+
+// Check Errors
+	const errors = req.validationErrors();
+	if (errors) {
+		return done(null, false, { errors });
+	}
+
+// Check for username and password match
 	db('users')
 	.where('userName', username)
 	.first()
@@ -16,12 +27,30 @@ function authenticate(username, password, done) {
 }
 
 function register(req, username, password, done) {
+// Form Validator
+	req.checkBody('username', 'Username field is required').notEmpty();
+	req.checkBody('firstName', 'First name field is required').notEmpty();
+	req.checkBody('lastName', 'Last name field is required').notEmpty();
+	req.checkBody('email', 'Email field is required').notEmpty();
+	req.checkBody('email', 'Email is not a valid email address').isEmail();
+	req.checkBody('password', 'Password field is required').notEmpty();
+	req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
+
+// Check Errors
+	const errors = req.validationErrors();
+	if (errors) {
+		return done(null, false, { errors });
+	}
+
+// Handle image name
 	let profileImage;
 	if (req.file) {
 		profileImage = req.file.filename;
 	} else {
 		profileImage = 'noimage.jpg';
 	}
+
+// Check db to see if user exists
 	db('users')
 	.where('userName', username)
 	.first()
@@ -32,6 +61,8 @@ function register(req, username, password, done) {
 		if (password !== req.body.password2) {
 			return done(null, false, { message: 'Sorry, passwords don\'t match' });
 		}
+
+// Create user
 		const newUser = {
 			userName: username,
 			firstName: req.body.firstName,
@@ -51,7 +82,7 @@ function register(req, username, password, done) {
 	});
 }
 
-passport.use(new LocalStrategy(authenticate));
+passport.use(new LocalStrategy({ passReqToCallback: true }, authenticate));
 passport.use('local-register', new LocalStrategy({ passReqToCallback: true }, register));
 // passport.use(new GitHubStrategy({
 // 	// Need to protect these keys

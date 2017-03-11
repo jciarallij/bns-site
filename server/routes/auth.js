@@ -22,10 +22,15 @@ router
 	.get('/login', isLoggedIn, (req, res, next) => {
 		res.render('login');
 	})
-	.post('/login', passport.authenticate('local', {
-		successRedirect: 'blogs',
-		failureRedirect: 'login'
-	}))
+	.post('/login',
+		passport.authenticate('local', {
+			failureRedirect: 'login'
+		}),
+		(req, res) => {
+			req.flash('success', 'You are now logged in');
+			res.redirect('blogs');
+		}
+	)
 	.get('/logout', (req, res, next) => {
 		req.session.destroy(err => {
 			res.redirect('login');
