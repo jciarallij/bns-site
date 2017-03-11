@@ -1,5 +1,8 @@
 const passport = require('passport');
 const router = require('express').Router();
+const multer = require('multer');
+
+const upload = multer({ dest: './uploads/profileImages' });
 
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated()) {
@@ -31,10 +34,11 @@ router
 	.get('/register', isLoggedIn, (req, res, next) => {
 		res.render('register');
 	})
-	.post('/register', passport.authenticate('local-register', {
+	.post('/register', upload.single('profileImage'), passport.authenticate('local-register', {
 		successRedirect: 'blogs',
 		failureRedirect: 'register'
 	}));
+
 // 	.get('/auth/github',
 //   passport.authenticate('github', { scope: ['user:email'] }))
 // 	.get('/auth/github/callback',

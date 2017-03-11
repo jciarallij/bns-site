@@ -1,4 +1,4 @@
-<form action="/api/register" method="post">
+<form action="/api/register" enctype='multipart/form-data' method="post">
 	<div>
 		<label>Username:</label>
 		<input type="text" name="username"/>
@@ -22,6 +22,10 @@
 	<div>
 		<label>Password (repeat):</label>
 		<input type="text" name="password2"/>
+	</div>
+		<div>
+		<label>Profile Image:</label>
+		<input type="file" name="profileImage"/>
 	</div>
 	<div>
 		<input type="submit" name="Sign Up!"/>

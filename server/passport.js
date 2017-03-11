@@ -16,6 +16,12 @@ function authenticate(username, password, done) {
 }
 
 function register(req, username, password, done) {
+	let profileImage;
+	if (req.file) {
+		profileImage = req.file.filename;
+	} else {
+		profileImage = 'noimage.jpg';
+	}
 	db('users')
 	.where('userName', username)
 	.first()
@@ -31,6 +37,7 @@ function register(req, username, password, done) {
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
 			email: req.body.email,
+			profileImage,
 			isAdmin: 0,
 			isStaff: 0,
 			password: bcrypt.hashSync(password)
