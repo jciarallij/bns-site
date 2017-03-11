@@ -6,10 +6,16 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var passport = require('passport');
 var RedisStore = require('connect-redis')(session);
+var expressValidator = require('express-validator');
+var expressMessages = require('express-messages');
+var multer = require('multer');
+var flash = require('connect-flash');
 var db = require('./db');
 var cache = require('./cache');
+var upload = multer({ dest: './uploads' });
 require('./passport');
 
+// Routes
 var authRoutes = require('./routes/auth');
 var blogsRoutes = require('./routes/blogs');
 var commentsRoutes = require('./routes/comments');
@@ -20,6 +26,7 @@ var app = express();
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hjs');
 
+// Middleware
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -37,11 +44,35 @@ app.use('/api', authRoutes);
 app.use('/api', blogsRoutes);
 app.use('/api', commentsRoutes);
 
+// Validator
+app.use(expressValidator({
+	errorFormatter(param, msg, value) {
+		var namespace = param.split('.');
+		var root = namespace.shift();
+		var formParam = root;
+		while (namespace.length) {
+			formParam += '[' + namespace.shift() + ']';
+		}
+		return {
+			param: formParam,
+			msg,
+			value
+		};
+	}
+}));
+
+// Flash messages
+app.use(flash());
+app.use(function (req, res, next) {
+	res.locals.messages = expressMessages(req, res);
+	next();
+});
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
-  next(err);
+	next(err);
 });
 
 // error handler
