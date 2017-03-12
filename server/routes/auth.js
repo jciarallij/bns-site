@@ -12,6 +12,7 @@ function isLoggedIn(req, res, next) {
 }
 
 router
+// .GET to get current user
 	.get('/', (req, res, next) => {
 		res.send({
 			session: req.session,
@@ -19,18 +20,26 @@ router
 			authenticated: req.isAuthenticated(),
 		});
 	})
+
+// .GET render login page (ONLY NEEDED IN DEV)
 	.get('/login', isLoggedIn, (req, res, next) => {
 		res.render('login');
 	})
+
+// .GET for logout and destroy the session
 	.get('/logout', (req, res, next) => {
 		req.session.destroy(err => {
 			req.flash('success', 'You have been logged out.');
 			res.redirect('login');
 		});
 	})
+
+// .GET render register page (ONLY NEEDED IN DEV)
 	.get('/register', isLoggedIn, (req, res, next) => {
 		res.render('register');
 	})
+
+// .POST for user login
 	.post('/login',
 		passport.authenticate('local', {
 			failureRedirect: 'login'
@@ -40,6 +49,8 @@ router
 			res.redirect('blogs');
 		}
 	)
+
+// .POST for registering new user
 	.post('/register',
 		upload.single('profileImage'), passport.authenticate('local-register', {
 			failureRedirect: 'register'

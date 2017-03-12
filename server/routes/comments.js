@@ -31,7 +31,7 @@ function authRequired(req, res, next) {
 }
 
 router
-// Get all comments that have not been apporved
+// .GET all comments that have not been apporved
 	.get('/unapprovedComments', loginRequired, staffRequired, (req, res, next) => {
 		db('comments')
 			.where('isApproved', 0)
@@ -43,7 +43,7 @@ router
 			}, next);
 	})
 
-// Get to approve comment by id
+// .GET for approving comment by id
 	.get('/approveComment/:id', loginRequired, staffRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('comments')
@@ -53,13 +53,15 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to approve comment' });
 				}
+				req.flash('success', 'Comment approved.');
 				res.sendStatus(200);
 			}, next);
 	})
 
-// Get for liking comment by id
+// .GET for liking comment by id
 	.get('/likeComment/:id', loginRequired, (req, res, next) => {
 		const { id } = req.params;
+// TO-DO need to create array on user table to hold blogs and comments liked so user can't multiple like
 		db('comments')
 			.where('id', id)
 			.increment('likes', 1)
@@ -67,54 +69,86 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to like comment' });
 				}
+				req.flash('success', 'Comment liked.');
 				res.sendStatus(200);
 			}, next);
 	})
 
-// Post comment for a blog
-	.post('/addComment', loginRequired, (req, res, next) => {
-		const newComment = {
-	// DELETE THIS SEED DATA FOR userName
-			createdBy: 'Tlobaugh',
-			// createdBy: req.user.userName,
-			blogTitle: req.body.blogTitle,
-			body: req.body.body
-		};
-		if (req.user.isStaff) {
-			newComment.isAllowed = 1;
-		}
-		db('comments')
-			.insert(newComment)
-			.then(comments => {
-				if (!comments) {
-					return res.send({ message: 'Error...Couldn\'t post your comment' });
-				}
-				newComment.id = comments[0];
-				res.send(newComment);
-			}, next);
-	})
+// .POST comment for a blog
+	.post('/addComment',
+		loginRequired,
+		(req, res, next) => {
+// Form Validator
+			req.checkBody('blogTitle', 'Blog Title field is required').notEmpty();
+			req.checkBody('body', 'Body field is required').notEmpty();
 
-// Put to edit comment by id, user can edit own comments and staff and edit all comments
-	.put('/editComment/:id', loginRequired, authRequired, (req, res, next) => {
-		const { id } = req.params;
-		req.body.hasEdit = 1;
-		if (req.user.isStaff) {
-			req.body.isAllowed = 1;
-		} else {
-			req.body.isAllowed = 0;
-		}
-		db('comments')
-			.where('id', id)
-			.update(req.body)
-			.then(result => {
-				if (result === 0) {
-					return res.send({ message: 'Sorry unable to edit blog' });
-				}
-				res.sendStatus(200);
-			}, next);
-	})
+// Check Errors
+			const errors = req.validationErrors();
+			if (errors) {
+				return next({ errors });
+			}
 
-// Delete to delete comment by ID user can delete own comments and staff and delete all comments
+			const newComment = {
+				createdBy: req.user.userName,
+				blogTitle: req.body.blogTitle,
+				body: req.body.body
+			};
+			if (req.user.isStaff) {
+				newComment.isAllowed = 1;
+			}
+			db('comments')
+				.insert(newComment)
+				.then(comments => {
+					if (!comments) {
+						return res.send({ message: 'Error...Couldn\'t post your comment' });
+					}
+					newComment.id = comments[0];
+					req.flash('success', 'Comment added. Will need to be approved before visable.');
+					res.send(newComment);
+				}, next);
+		})
+
+// .PUT to edit comment by id, user can edit own comments and staff and edit all comments
+	.put('/editComment/:id',
+		loginRequired,
+		authRequired,
+		(req, res, next) => {
+// Form Validator
+			req.checkBody('createdBy', 'Created By field is required').notEmpty();
+			req.checkBody('blogTitle', 'Blog Title field is required').notEmpty();
+			req.checkBody('body', 'Body field is required').notEmpty();
+
+// Check Errors
+			const errors = req.validationErrors();
+			if (errors) {
+				return next({ errors });
+			}
+
+// Handle fields
+			const { id } = req.params;
+			req.body.hasEdit = 1;
+			req.body.editedBy = req.user.userName;
+
+			if (req.user.isStaff) {
+				req.body.isAllowed = 1;
+			} else {
+				req.body.isAllowed = 0;
+			}
+
+// Update comment to db
+			db('comments')
+				.where('id', id)
+				.update(req.body)
+				.then(result => {
+					if (result === 0) {
+						return res.send({ message: 'Sorry unable to edit blog' });
+					}
+					req.flash('success', 'Comment updated.');
+					res.sendStatus(200);
+				}, next);
+		})
+
+// .DELETE to delete comment by ID user can delete own comments and staff and delete all comments
 	.delete('/deleteComment/:id', loginRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('comments')
@@ -124,6 +158,7 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to delete comment' });
 				}
+				req.flash('success', 'Comment deleted.');
 				res.sendStatus(200);
 			}, next);
 	});

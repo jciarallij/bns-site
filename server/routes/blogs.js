@@ -40,24 +40,11 @@ router
 			.select('title', 'description', 'createdBy', 'createdAt', 'likes')
 			.from('blogs')
 			.then(blogs => {
+// TO-DO need to uncomment and delete the render once client side has been created.	
 				// res.send(blogs);
 				res.render('blogs', { blogs });
 			});
 	})
-
-// Get full individual blog by id WITH JOIN
-	// .get('/blog/:id', loginRequired, (req, res, next) => {
-	// 	const { id } = req.params;
-	// 	db('blogs')
-	// 		.leftJoin('comments', 'blogs.title', 'comments.blogTitle')
-	// 		.where('blogs.id', id)
-	// 		.then(blog => {
-	// 			if (!blog) {
-	// 				return res.send({ message: `Sorry blog ${id} couldn't be found` });
-	// 			}
-	// 			res.send(blog);
-	// 		}, next);
-	// })
 
 // Get full individual blog and comments by id WITHOUT JOIN
 	.get('/blog/:id', loginRequired, (req, res, next) => {
@@ -90,6 +77,7 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to like blog' });
 				}
+				req.flash('success', 'Blog liked.');
 				res.sendStatus(200);
 			}, next);
 	})
@@ -101,8 +89,12 @@ router
 		staffRequired,
 		(req, res, next) => {
 // Form Validator
-			req.checkBody('title', 'Username field is required').notEmpty();
-			req.checkBody('body', 'First name field is required').notEmpty();
+			req.checkBody('title', 'Title field is required').notEmpty();
+			req.checkBody('body', 'Body field is required').notEmpty();
+			req.checkBody('twitter', 'Twitter field is required').notEmpty();
+			req.checkBody('fb', 'FB field is required').notEmpty();
+			req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
+			req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
 
 // Check Errors
 			const errors = req.validationErrors();
@@ -133,8 +125,12 @@ router
 				createdBy: req.user.userName,
 				title: req.body.title,
 				description: req.body.description,
+				blogImage,
 				body: req.body.body,
-				blogImage
+				twitter: req.body.twitter,
+				fb: req.body.fb,
+				personalWebsite: req.body.personalWebsite,
+				linkedin: req.body.linkedin
 			};
 			db('blogs')
 				.insert(newBlog)
@@ -144,27 +140,56 @@ router
 					}
 					newBlog.id = blogIds[0];
 					req.flash('success', 'Blog added.');
-					res.redirect('/api/blogs');
-					// res.send(newBlog);
+					res.send(newBlog);
 				}, next);
 		})
 
 // Put for editing blog, Staff can only edit their own blogs and Admin can edit all
-	.put('/editBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
-		const { id } = req.params;
-		req.body.hasEdit = 1;
-		db('blogs')
-			.where('id', id)
-			.update(req.body)
-			.then(result => {
-				if (result === 0) {
-					return res.send({ message: 'Sorry unable to edit blog' });
-				}
-				res.sendStatus(200);
-			}, next);
-	})
+	.put('/editBlog/:id',
+		upload.single('blogImage'),
+		loginRequired,
+		staffRequired,
+		authRequired,
+		(req, res, next) => {
+// Form Validator
+			req.checkBody('createdBy', 'Created By field is required').notEmpty();
+			req.checkBody('title', 'Title field is required').notEmpty();
+			req.checkBody('body', 'Body field is required').notEmpty();
+			req.checkBody('twitter', 'Twiter field is required').notEmpty();
+			req.checkBody('fb', 'FB field is required').notEmpty();
+			req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
+			req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
 
-// Delete to delete blogs, Staff can oly delete their own blogs and Admin can delete all.
+// Check Errors
+			const errors = req.validationErrors();
+			if (errors) {
+				return next({ errors });
+			}
+
+// Handle new image name if added
+			if (req.file) {
+				req.body.blogImage = req.file.filename;
+			}
+
+// Handle fields
+			const { id } = req.params;
+			req.body.editedBy = req.user.userName;
+			req.body.hasEdit = 1;
+
+// Update blog to db
+			db('blogs')
+				.where('id', id)
+				.update(req.body)
+				.then(result => {
+					if (result === 0) {
+						return res.send({ message: 'Sorry unable to edit blog' });
+					}
+					req.flash('success', 'Blog edited.');
+					res.sendStatus(200);
+				}, next);
+		})
+
+// Delete to delete blogs, Staff can only delete their own blogs and Admin can delete all.
 	.delete('/deleteBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('blogs')
@@ -174,6 +199,7 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to delete blog' });
 				}
+				res.flash('success', 'Blog deleted');
 				res.sendStatus(200);
 			}, next);
 	});
