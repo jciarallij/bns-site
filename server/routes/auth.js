@@ -22,27 +22,33 @@ router
 	.get('/login', isLoggedIn, (req, res, next) => {
 		res.render('login');
 	})
-	.post('/login',
-		passport.authenticate('local', {
-			failureRedirect: 'login'
-		}),
-		(req, res) => {
-			req.flash('success', 'You are now logged in');
-			res.redirect('blogs');
-		}
-	)
 	.get('/logout', (req, res, next) => {
 		req.session.destroy(err => {
+			req.flash('success', 'You have been logged out.');
 			res.redirect('login');
 		});
 	})
 	.get('/register', isLoggedIn, (req, res, next) => {
 		res.render('register');
 	})
-	.post('/register', upload.single('profileImage'), passport.authenticate('local-register', {
-		successRedirect: 'blogs',
-		failureRedirect: 'register'
-	}));
+	.post('/login',
+		passport.authenticate('local', {
+			failureRedirect: 'login'
+		}),
+		(req, res) => {
+			req.flash('success', 'You are now logged in.');
+			res.redirect('blogs');
+		}
+	)
+	.post('/register',
+		upload.single('profileImage'), passport.authenticate('local-register', {
+			failureRedirect: 'register'
+		}),
+			(req, res) => {
+				req.flash('success', 'You have successfully registered.');
+				res.redirect('blogs');
+			}
+	);
 
 // 	.get('/auth/github',
 //   passport.authenticate('github', { scope: ['user:email'] }))

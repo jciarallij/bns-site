@@ -1,5 +1,8 @@
 const passport = require('passport');
 const router = require('express').Router();
+const multer = require('multer');
+
+const upload = multer({ dest: './uploads/blogImages' });
 const db = require('../db');
 
 function loginRequired(req, res, next) {
@@ -37,7 +40,8 @@ router
 			.select('title', 'description', 'createdBy', 'createdAt', 'likes')
 			.from('blogs')
 			.then(blogs => {
-				res.send(blogs);
+				// res.send(blogs);
+				res.render('blogs', { blogs });
 			});
 	})
 
@@ -91,34 +95,59 @@ router
 	})
 
 // Post for adding blogs by the Admin or Staff
-	.post('/addBlog', loginRequired, staffRequired, (req, res, next) => {
-		db('blogs')
-			.where('title', req.body.title)
-			.first()
-			.then(blog => {
-				if (blog) {
-					return res.send({ message: `Sorry blog title: ${req.body.title} already exists` });
-				}
-			}, next);
-		const newBlog = {
-			createdBy: req.user.userName,
-			title: req.body.title,
-			description: req.body.description,
-			body: req.body.body,
-		};
-		if (req.user.isAdmin) {
-			newBlog.isAllowed = 1;
-		}
-		db('blogs')
-			.insert(newBlog)
-			.then(blogIds => {
-				if (!blogIds) {
-					return res.send({ message: 'Error...Couldn\'t post blog' });
-				}
-				newBlog.id = blogIds[0];
-				res.send(newBlog);
-			}, next);
-	})
+	.post('/addBlog',
+		upload.single('blogImage'),
+		loginRequired,
+		staffRequired,
+		(req, res, next) => {
+// Form Validator
+			req.checkBody('title', 'Username field is required').notEmpty();
+			req.checkBody('body', 'First name field is required').notEmpty();
+
+// Check Errors
+			const errors = req.validationErrors();
+			if (errors) {
+				return next({ errors });
+			}
+
+// Handle image name
+			let blogImage;
+			if (req.file) {
+				blogImage = req.file.filename;
+			} else {
+				blogImage = 'noimage.jpg';
+			}
+
+// Check db for duplicate titles
+			db('blogs')
+				.where('title', req.body.title)
+				.first()
+				.then(blog => {
+					if (blog) {
+						return res.send({ message: `Sorry blog title: ${req.body.title} already exists` });
+					}
+				}, next);
+
+// Create new Blog
+			const newBlog = {
+				createdBy: req.user.userName,
+				title: req.body.title,
+				description: req.body.description,
+				body: req.body.body,
+				blogImage
+			};
+			db('blogs')
+				.insert(newBlog)
+				.then(blogIds => {
+					if (!blogIds) {
+						return res.send({ message: 'Error...Couldn\'t post blog' });
+					}
+					newBlog.id = blogIds[0];
+					req.flash('success', 'Blog added.');
+					res.redirect('/api/blogs');
+					// res.send(newBlog);
+				}, next);
+		})
 
 // Put for editing blog, Staff can only edit their own blogs and Admin can edit all
 	.put('/editBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {

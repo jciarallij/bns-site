@@ -48,13 +48,6 @@ app.use(expressValidator({
 	}
 }));
 
-// Flash messages
-app.use(flash());
-app.use(function (req, res, next) {
-	res.locals.messages = expressMessages(req, res);
-	next();
-});
-
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -67,6 +60,13 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Flash messages
+app.use(flash());
+app.use(function (req, res, next) {
+	res.locals.messages = expressMessages(req, res);
+	next();
+});
 
 // Routes
 app.use('/api', authRoutes);
