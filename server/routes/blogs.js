@@ -169,10 +169,12 @@ router
 			req.checkBody('createdBy', 'Created By field is required').notEmpty();
 			req.checkBody('title', 'Title field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
-			req.checkBody('twitter', 'Twiter field is required').notEmpty();
-			req.checkBody('fb', 'FB field is required').notEmpty();
-			req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
-			req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
+
+// TO-DO uncomment once form is created with these options
+			// req.checkBody('twitter', 'Twiter field is required').notEmpty();
+			// req.checkBody('fb', 'FB field is required').notEmpty();
+			// req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
+			// req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
 
 // Check Errors
 			const errors = req.validationErrors();
