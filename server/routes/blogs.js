@@ -40,7 +40,7 @@ router
 			.select('title', 'description', 'createdBy', 'createdAt', 'likes')
 			.from('blogs')
 			.then(blogs => {
-// TO-DO need to uncomment and delete the render once client side has been created.	
+// TO-DO need to uncomment and delete the render once client side has been created.
 				// res.send(blogs);
 				res.render('blogs', { blogs });
 			});
@@ -70,6 +70,10 @@ router
 // Get for liking blog
 	.get('/likeBlog/:id', loginRequired, (req, res, next) => {
 		const { id } = req.params;
+		const blogsLikedArray = req.user.blogsLiked.split(',');
+		if (blogsLikedArray.includes(id)) {
+			return res.send({ message: 'Sorry already liked this blog.' });
+		}
 		db('blogs')
 			.where('id', id)
 			.increment('likes', 1)
@@ -77,8 +81,16 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to like blog' });
 				}
-				req.flash('success', 'Blog liked.');
-				res.sendStatus(200);
+				db('users')
+				.where('userName', req.user.userName)
+				.update('blogsLiked', `${req.user.blogsLiked},${id}`)
+				.then(blogsLiked => {
+					if (!blogsLiked) {
+						return res.send({ message: 'Error...Couldn\'t update user blogsLiked' });
+					}
+					req.flash('success', 'Blog liked.');
+					res.sendStatus(200);
+				}, next);
 			}, next);
 	})
 
@@ -91,10 +103,12 @@ router
 // Form Validator
 			req.checkBody('title', 'Title field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
-			req.checkBody('twitter', 'Twitter field is required').notEmpty();
-			req.checkBody('fb', 'FB field is required').notEmpty();
-			req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
-			req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
+
+// TO-DO uncomment once form is created with these options
+			// req.checkBody('twitter', 'Twitter field is required').notEmpty();
+			// req.checkBody('fb', 'FB field is required').notEmpty();
+			// req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
+			// req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
 
 // Check Errors
 			const errors = req.validationErrors();
@@ -175,6 +189,7 @@ router
 			const { id } = req.params;
 			req.body.editedBy = req.user.userName;
 			req.body.hasEdit = 1;
+			req.body.editedAt = new Date();
 
 // Update blog to db
 			db('blogs')

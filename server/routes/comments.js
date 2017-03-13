@@ -61,7 +61,10 @@ router
 // .GET for liking comment by id
 	.get('/likeComment/:id', loginRequired, (req, res, next) => {
 		const { id } = req.params;
-// TO-DO need to create array on user table to hold blogs and comments liked so user can't multiple like
+		const commentsLikedArray = req.user.commentsLiked.split(',');
+		if (commentsLikedArray.includes(id)) {
+			return res.send({ message: 'Sorry already liked this comment.' });
+		}
 		db('comments')
 			.where('id', id)
 			.increment('likes', 1)
@@ -69,8 +72,16 @@ router
 				if (result === 0) {
 					return res.send({ message: 'Sorry unable to like comment' });
 				}
-				req.flash('success', 'Comment liked.');
-				res.sendStatus(200);
+				db('users')
+				.where('userName', req.user.userName)
+				.update('commentsLiked', `${req.user.commentsLiked},${id}`)
+				.then(commentsLiked => {
+					if (!commentsLiked) {
+						return res.send({ message: 'Error...Couldn\'t update user commentsLiked' });
+					}
+					req.flash('success', 'Comment liked.');
+					res.sendStatus(200);
+				}, next);
 			}, next);
 	})
 
@@ -128,6 +139,7 @@ router
 			const { id } = req.params;
 			req.body.hasEdit = 1;
 			req.body.editedBy = req.user.userName;
+			req.body.editedAt = new Date();
 
 			if (req.user.isStaff) {
 				req.body.isAllowed = 1;

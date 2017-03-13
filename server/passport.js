@@ -67,11 +67,13 @@ function register(req, username, password, done) {
 			userName: username,
 			firstName: req.body.firstName,
 			lastName: req.body.lastName,
-			email: req.body.email,
 			profileImage,
+			email: req.body.email,
+			password: bcrypt.hashSync(password),
+			blogsLiked: '0',
+			commentsLiked: '0',
 			isAdmin: 0,
 			isStaff: 0,
-			password: bcrypt.hashSync(password)
 		};
 		db('users')
 		.insert(newUser)

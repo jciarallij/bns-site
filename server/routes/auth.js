@@ -29,7 +29,8 @@ router
 // .GET for logout and destroy the session
 	.get('/logout', (req, res, next) => {
 		req.session.destroy(err => {
-			req.flash('success', 'You have been logged out.');
+// TO-DO flash requires sessions so need to sort this out cuz session is destroyed
+			// req.flash('success', 'You have been logged out.');
 			res.redirect('login');
 		});
 	})
