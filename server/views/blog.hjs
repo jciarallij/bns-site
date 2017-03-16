@@ -22,14 +22,13 @@
     	<p>Written by: {{createdBy}} | On: {{createdAt}}</p>
     	<p>Editied by: {{editedBy}} | On: {{editedAt}}</p>
     	<h3>Likes: {{likes}} | <a href='/api/likeComment/{{id}}'>Like this Comment</a></h3>
-    	<a href='/api/deleteComment/{{id}}'>Delete this Comment</a>
+    	<a href='/api/deleteComment/{{id}}/{{createdBy}}'>Delete this Comment</a>
     </li>
   {{/comments}}
 </ul>
 
 <form action='/api/addComment' method='post'>
 	<div>
-		<input type='hidden' value='{{blog.title}}' name='blogTitle'/>
 		<input type='hidden' value='{{blog.id}}' name='blogId'/>
 	</div>
 	<div>

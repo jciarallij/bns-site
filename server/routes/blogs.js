@@ -28,7 +28,9 @@ function staffRequired(req, res, next) {
 // }
 
 function authRequired(req, res, next) {
-	if (!(req.user.userName === req.body.createdBy) || !req.user.isAdmin) {
+	console.log('Checking Auth', req.params);
+	const { createdBy } = req.params || null;
+	if (!(req.user.userName === req.body.createdBy || createdBy) || !req.user.isAdmin) {
 		return res.render('403');
 	}
 	next();
@@ -61,7 +63,10 @@ router
 					return res.send({ message: `Sorry blog ${id} couldn't be found` });
 				}
 				db('comments')
-					.where('blogTitle', blog.title)
+					.where({
+						blogId: id,
+						isAllowed: 1
+					})
 					.then(comments => {
 						if (!comments) {
 							return res.send({ message: 'Sorry unable to get comments' });
@@ -225,23 +230,21 @@ router
 		})
 
 // Delete to delete blogs, Staff can only delete their own blogs and Admin can delete all.
-	.get('/deleteBlog/:id', loginRequired, staffRequired,
-// authRequired will not work with get becuase no body being sent with createdBy to compare with user.
-		// authRequired,
-		(req, res, next) => {
-	// .delete('/deleteBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
-			const { id } = req.params;
-			db('blogs')
-				.where('id', id)
-				.delete()
-				.then(result => {
-					if (result === 0) {
-						return res.send({ message: 'Sorry unable to delete blog' });
-					}
-					req.flash('success', 'Blog deleted');
-					// res.sendStatus(200);
-					res.redirect('/api/blogs');
-				}, next);
-		});
+	// .delete('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
+	.get('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
+		console.log(req.params);
+		const { id } = req.params;
+		db('blogs')
+			.where('id', id)
+			.delete()
+			.then(result => {
+				if (result === 0) {
+					return res.send({ message: 'Sorry unable to delete blog' });
+				}
+				req.flash('success', 'Blog deleted');
+				// res.sendStatus(200);
+				res.redirect('/api/blogs');
+			}, next);
+	});
 
 module.exports = router;

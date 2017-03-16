@@ -6,7 +6,7 @@
     	<p>{{description}}</p>
     	<p>Written by: {{createdBy}} | On: {{createdAt}}
     	<div>Likes:{{likes}}</div>
-    	<a href="/api/deleteBlog/{{id}}">Delete this Blog</a>
+    	<a href="/api/deleteBlog/{{id}}/{{createdBy}}">Delete this Blog</a>
     </li>
   {{/blogs}}
 </ul>

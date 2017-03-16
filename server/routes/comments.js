@@ -24,7 +24,8 @@ function adminRequired(req, res, next) {
 }
 
 function authRequired(req, res, next) {
-	if (!(req.user.userName === req.body.createdBy) || !req.user.isStaff) {
+	const { createdBy } = req.params || null;
+	if (!(req.user.userName === req.body.createdBy || createdBy) || !req.user.isStaff) {
 		return res.render('403');
 	}
 	next();
@@ -91,7 +92,7 @@ router
 		(req, res, next) => {
 			console.log(req.body);
 // Form Validator
-			req.checkBody('blogTitle', 'Blog Title field is required').notEmpty();
+			req.checkBody('blogId', 'Blog ID field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
 
 // Check Errors
@@ -102,7 +103,7 @@ router
 
 			const newComment = {
 				createdBy: req.user.userName,
-				blogTitle: req.body.blogTitle,
+				blogId: req.body.blogId,
 				body: req.body.body
 			};
 			if (req.user.isStaff) {
@@ -163,23 +164,19 @@ router
 		})
 
 // .DELETE to delete comment by ID user can delete own comments and staff and delete all comments
-	.get('/deleteComment/:id',
-		loginRequired,
-// authRequired will not work with GET becuase no body being sent with createdBy to compare with user.
-		// authRequired,
-		(req, res, next) => {
-	// .delete('/deleteComment/:id', loginRequired, authRequired, (req, res, next) => {
-			const { id } = req.params;
-			db('comments')
-				.where('id', id)
-				.delete()
-				.then(result => {
-					if (result === 0) {
-						return res.send({ message: 'Sorry unable to delete comment' });
-					}
-					req.flash('success', 'Comment deleted.');
-					res.sendStatus(200);
-				}, next);
-		});
+	// .delete('/deleteComment/:id/:createdBy', loginRequired, authRequired, (req, res, next) => {
+	.get('/deleteComment/:id/:createdBy', loginRequired, authRequired, (req, res, next) => {
+		const { id } = req.params;
+		db('comments')
+			.where('id', id)
+			.delete()
+			.then(result => {
+				if (result === 0) {
+					return res.send({ message: 'Sorry unable to delete comment' });
+				}
+				req.flash('success', 'Comment deleted.');
+				res.sendStatus(200);
+			}, next);
+	});
 
 module.exports = router;
