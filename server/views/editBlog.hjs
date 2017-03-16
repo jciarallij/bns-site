@@ -1,4 +1,4 @@
-{{title}}
+<h1>{{title}}</h1>
 <ul>
   {{#blogs}}
     <li>{{title}} <a href="/api/deleteBlog/{{id}}">x</a></li>

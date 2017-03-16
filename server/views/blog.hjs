@@ -1,0 +1,42 @@
+<h1>{{title}}</h1>
+
+<h2>{{blog.descritpion}}</h2>
+
+<p>{{blog.body}}</p>
+
+<div>Created By: {{blog.createdBy}}</div>
+<div>Created On: {{blog.createdAt}}</div>
+<div>Edited By: {{blog.editedBy}}</div>
+<div>Editid On: {{blog.editedAt}}</div>
+<div>Likes: {{blog.likes}} |  <a href='/api/likeBlog/{{blog.id}}'>Like this Blog</a></div>
+<div>Posted on Twitter: {{blog.twitter}}</div>
+<div>Posted on Facebook: {{blog.fb}}</div>
+<div>Posted on Website: {{blog.personalWebsite}}</div>
+<div>Posted on Linkedin: {{blog.linkedin}}</div>
+
+
+<ul>
+  {{#comments}}
+    <li> 
+    	<p>{{body}}</p>
+    	<p>Written by: {{createdBy}} | On: {{createdAt}}</p>
+    	<p>Editied by: {{editedBy}} | On: {{editedAt}}</p>
+    	<h3>Likes: {{likes}} | <a href='/api/likeComment/{{id}}'>Like this Comment</a></h3>
+    	<a href='/api/deleteComment/{{id}}'>Delete this Comment</a>
+    </li>
+  {{/comments}}
+</ul>
+
+<form action='/api/addComment' method='post'>
+	<div>
+		<input type='hidden' value='{{blog.title}}' name='blogTitle'/>
+		<input type='hidden' value='{{blog.id}}' name='blogId'/>
+	</div>
+	<div>
+		<label>Comment:</label>
+		<textarea rows='4' cols='50' maxlength='255' name='body'></textarea>
+	</div>
+	<div>
+		<input type='submit' name='submit' value='ADD COMMENT'/>
+	</div>
+</form>

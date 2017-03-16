@@ -1,3 +1,4 @@
+<h1>{{title}}</h1>
 <form action="/api/register" enctype='multipart/form-data' method="post">
 	<div>
 		<label>Username:</label>

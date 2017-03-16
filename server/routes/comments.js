@@ -87,8 +87,9 @@ router
 
 // .POST comment for a blog
 	.post('/addComment',
-		loginRequired,
+			loginRequired,
 		(req, res, next) => {
+			console.log(req.body);
 // Form Validator
 			req.checkBody('blogTitle', 'Blog Title field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
@@ -115,7 +116,8 @@ router
 					}
 					newComment.id = comments[0];
 					req.flash('success', 'Comment added. Will need to be approved before visable.');
-					res.send(newComment);
+					// res.send(newComment);
+					res.redirect(`/api/blog/${req.body.blogId}`);
 				}, next);
 		})
 
@@ -161,18 +163,23 @@ router
 		})
 
 // .DELETE to delete comment by ID user can delete own comments and staff and delete all comments
-	.delete('/deleteComment/:id', loginRequired, authRequired, (req, res, next) => {
-		const { id } = req.params;
-		db('comments')
-			.where('id', id)
-			.delete()
-			.then(result => {
-				if (result === 0) {
-					return res.send({ message: 'Sorry unable to delete comment' });
-				}
-				req.flash('success', 'Comment deleted.');
-				res.sendStatus(200);
-			}, next);
-	});
+	.get('/deleteComment/:id',
+		loginRequired,
+// authRequired will not work with GET becuase no body being sent with createdBy to compare with user.
+		// authRequired,
+		(req, res, next) => {
+	// .delete('/deleteComment/:id', loginRequired, authRequired, (req, res, next) => {
+			const { id } = req.params;
+			db('comments')
+				.where('id', id)
+				.delete()
+				.then(result => {
+					if (result === 0) {
+						return res.send({ message: 'Sorry unable to delete comment' });
+					}
+					req.flash('success', 'Comment deleted.');
+					res.sendStatus(200);
+				}, next);
+		});
 
 module.exports = router;

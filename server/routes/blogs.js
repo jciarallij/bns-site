@@ -19,12 +19,13 @@ function staffRequired(req, res, next) {
 	next();
 }
 
-function adminRequired(req, res, next) {
-	if (!req.user.isAdmin) {
-		return res.render('403');
-	}
-	next();
-}
+// NOT USED
+// function adminRequired(req, res, next) {
+// 	if (!req.user.isAdmin) {
+// 		return res.render('403');
+// 	}
+// 	next();
+// }
 
 function authRequired(req, res, next) {
 	if (!(req.user.userName === req.body.createdBy) || !req.user.isAdmin) {
@@ -37,12 +38,15 @@ router
 // Get all blogs with Title, Description, Ceated By, Created Date and Likes
 	.get('/blogs', loginRequired, (req, res, next) => {
 		db
-			.select('title', 'description', 'createdBy', 'createdAt', 'likes')
+			.select('id', 'title', 'description', 'createdBy', 'createdAt', 'likes')
 			.from('blogs')
 			.then(blogs => {
 // TO-DO need to uncomment and delete the render once client side has been created.
 				// res.send(blogs);
-				res.render('blogs', { blogs });
+				res.render('blogs', {
+					title: 'Blogs Shortened',
+					blogs
+				});
 			});
 	})
 
@@ -62,7 +66,12 @@ router
 						if (!comments) {
 							return res.send({ message: 'Sorry unable to get comments' });
 						}
-						res.send({ blog, comments });
+						// res.send({ blog, comments });
+						res.render('blog', {
+							title: blog.title,
+							blog,
+							comments
+						});
 					}, next);
 			}, next);
 	})
@@ -94,12 +103,20 @@ router
 			}, next);
 	})
 
+// .GET for rendering addBlog page
+	.get('/addBlog', loginRequired, staffRequired, (req, res, next) => {
+		res.render('addBlog', {
+			title: 'Add A Blog'
+		});
+	})
+
 // Post for adding blogs by the Admin or Staff
 	.post('/addBlog',
 		upload.single('blogImage'),
 		loginRequired,
 		staffRequired,
 		(req, res, next) => {
+			console.log(req.body);
 // Form Validator
 			req.checkBody('title', 'Title field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
@@ -154,7 +171,8 @@ router
 					}
 					newBlog.id = blogIds[0];
 					req.flash('success', 'Blog added.');
-					res.send(newBlog);
+					// res.send(newBlog);
+					res.redirect('blogs');
 				}, next);
 		})
 
@@ -207,18 +225,23 @@ router
 		})
 
 // Delete to delete blogs, Staff can only delete their own blogs and Admin can delete all.
-	.delete('/deleteBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
-		const { id } = req.params;
-		db('blogs')
-			.where('id', id)
-			.delete()
-			.then(result => {
-				if (result === 0) {
-					return res.send({ message: 'Sorry unable to delete blog' });
-				}
-				res.flash('success', 'Blog deleted');
-				res.sendStatus(200);
-			}, next);
-	});
+	.get('/deleteBlog/:id', loginRequired, staffRequired,
+// authRequired will not work with get becuase no body being sent with createdBy to compare with user.
+		// authRequired,
+		(req, res, next) => {
+	// .delete('/deleteBlog/:id', loginRequired, staffRequired, authRequired, (req, res, next) => {
+			const { id } = req.params;
+			db('blogs')
+				.where('id', id)
+				.delete()
+				.then(result => {
+					if (result === 0) {
+						return res.send({ message: 'Sorry unable to delete blog' });
+					}
+					req.flash('success', 'Blog deleted');
+					// res.sendStatus(200);
+					res.redirect('/api/blogs');
+				}, next);
+		});
 
 module.exports = router;
