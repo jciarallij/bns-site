@@ -74,6 +74,10 @@ function register(req, username, password, done) {
 			commentsLiked: '0',
 			isAdmin: 0,
 			isStaff: 0,
+			twitter: req.body.twitter,
+			fb: req.body.fb,
+			personalWebsite: req.body.personalWebsite,
+			linkedin: req.body.linkedin
 		};
 		db('users')
 		.insert(newUser)

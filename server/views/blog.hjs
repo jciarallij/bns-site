@@ -1,6 +1,6 @@
 <h1>{{title}}</h1>
 
-<h2>{{blog.descritpion}}</h2>
+<h2>{{blog.description}}</h2>
 
 <p>{{blog.body}}</p>
 
@@ -9,11 +9,6 @@
 <div>Edited By: {{blog.editedBy}}</div>
 <div>Editid On: {{blog.editedAt}}</div>
 <div>Likes: {{blog.likes}} |  <a href='/api/likeBlog/{{blog.id}}'>Like this Blog</a></div>
-<div>Posted on Twitter: {{blog.twitter}}</div>
-<div>Posted on Facebook: {{blog.fb}}</div>
-<div>Posted on Website: {{blog.personalWebsite}}</div>
-<div>Posted on Linkedin: {{blog.linkedin}}</div>
-
 
 <ul>
   {{#comments}}

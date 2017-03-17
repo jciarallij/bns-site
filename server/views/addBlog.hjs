@@ -18,21 +18,6 @@
 		<input type='file' name='blogImage'/>
 	</div>
 	<div>
-	<label>Social Media:</label>
-		<div>
-			<input type='checkbox' name='twitter' value='1'/> Twitter
-		</div>
-		<div>
-			<input type='checkbox' name='fb' value='1'/> Facebook
-		</div>
-		<div>
-			<input type='checkbox' name='personalWebsite' value='1'/> Website
-		</div>
-		<div>
-			<input type='checkbox' name='linkedin' value='1'/> Linkedin
-		</div>
-	</div>
-	<div>
 		<input type='submit' name='submit!' value='ADD BLOG'/>
 	</div>
 </form>

@@ -24,9 +24,25 @@
 		<label>Password (repeat):</label>
 		<input type="text" name="password2"/>
 	</div>
-		<div>
+	<div>
 		<label>Profile Image:</label>
 		<input type="file" name="profileImage"/>
+	</div>
+	<div>
+		<label>Twitter link:</label>
+		<input type="text" name="twitter"/>
+	</div>
+	<div>
+		<label>Facebook link:</label>
+		<input type="text" name="fb"/>
+	</div>
+	<div>
+		<label>Personal Website:</label>
+		<input type="text" name="personalWebsite"/>
+	</div>
+	<div>
+		<label>Linkedin link:</label>
+		<input type="text" name="linkedin"/>
 	</div>
 	<div>
 		<input type="submit" name="Sign Up!"/>

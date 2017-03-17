@@ -28,7 +28,6 @@ function staffRequired(req, res, next) {
 // }
 
 function authRequired(req, res, next) {
-	console.log('Checking Auth', req.params);
 	const { createdBy } = req.params || null;
 	if (!(req.user.userName === req.body.createdBy || createdBy) || !req.user.isAdmin) {
 		return res.render('403');
@@ -121,16 +120,9 @@ router
 		loginRequired,
 		staffRequired,
 		(req, res, next) => {
-			console.log(req.body);
 // Form Validator
 			req.checkBody('title', 'Title field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
-
-// TO-DO uncomment once form is created with these options
-			// req.checkBody('twitter', 'Twitter field is required').notEmpty();
-			// req.checkBody('fb', 'FB field is required').notEmpty();
-			// req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
-			// req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
 
 // Check Errors
 			const errors = req.validationErrors();
@@ -193,12 +185,6 @@ router
 			req.checkBody('title', 'Title field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
 
-// TO-DO uncomment once form is created with these options
-			// req.checkBody('twitter', 'Twiter field is required').notEmpty();
-			// req.checkBody('fb', 'FB field is required').notEmpty();
-			// req.checkBody('personalWebsite', 'Personal Website field is required').notEmpty();
-			// req.checkBody('linkedin', 'Linkedin field is required').notEmpty();
-
 // Check Errors
 			const errors = req.validationErrors();
 			if (errors) {
@@ -232,7 +218,6 @@ router
 // Delete to delete blogs, Staff can only delete their own blogs and Admin can delete all.
 	// .delete('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
 	.get('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
-		console.log(req.params);
 		const { id } = req.params;
 		db('blogs')
 			.where('id', id)

@@ -35,7 +35,7 @@ router
 // .GET all comments that have not been apporved
 	.get('/unapprovedComments', loginRequired, staffRequired, (req, res, next) => {
 		db('comments')
-			.where('isApproved', 0)
+			.where('isAllowed', 0)
 			.then(comments => {
 				if (!comments) {
 					return res.send({ message: 'Sorry unable to retrieve any comments' });
