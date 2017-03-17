@@ -13,3 +13,5 @@ Set up AWS Simple email Service
 SQL sanitize
 
 Delete matching comments when blog is deleted
+
+Create migration files for automated deployment of db
