@@ -227,6 +227,14 @@ router
 					return res.send({ message: 'Sorry unable to delete blog' });
 				}
 				req.flash('success', 'Blog deleted');
+				db('comments')
+					.where('blogId', id)
+					.delete()
+					.then(commentsResult => {
+						if (commentsResult === 0) {
+							return res.send({ message: 'Sorry unable to delete comments' });
+						}
+					});
 				// res.sendStatus(200);
 				res.redirect('/api/blogs');
 			}, next);
