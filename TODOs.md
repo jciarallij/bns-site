@@ -6,9 +6,9 @@
 
 
 ## Server
-Create contact form endpoints for storing in DB and sending via email
-
 Set up AWS Simple email Service
+
+Set up contact request to send email via SES
 
 SQL sanitize
 
