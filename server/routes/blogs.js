@@ -6,15 +6,16 @@ const upload = multer({ dest: './uploads/blogImages' });
 const db = require('../db');
 
 function loginRequired(req, res, next) {
-	if (!req.isAuthenticated()) {
-		return res.redirect('/login');
-	}
+	console.log('Fake Authenticated');
+	// if (!req.isAuthenticated()) {
+	// 	return res.redirect('/login');
+	// }
 	next();
 }
 
 function staffRequired(req, res, next) {
 	if (!req.user.isStaff) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
@@ -22,7 +23,7 @@ function staffRequired(req, res, next) {
 // NOT USED
 // function adminRequired(req, res, next) {
 // 	if (!req.user.isAdmin) {
-// 		return res.render('403');
+// 		return res.sendStatus(403);
 // 	}
 // 	next();
 // }
@@ -30,7 +31,7 @@ function staffRequired(req, res, next) {
 function authRequired(req, res, next) {
 	const { createdBy } = req.params || null;
 	if (!(req.user.userName === req.body.createdBy || createdBy) || !req.user.isAdmin) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
@@ -42,12 +43,11 @@ router
 			.select('id', 'title', 'description', 'createdBy', 'createdAt', 'likes')
 			.from('blogs')
 			.then(blogs => {
-// TO-DO need to uncomment and delete the render once client side has been created.
-				// res.send(blogs);
-				res.render('blogs', {
-					title: 'Blogs Shortened',
-					blogs
-				});
+				res.send(blogs);
+				// res.render('blogs', {
+				// 	title: 'Blogs Shortened',
+				// 	blogs
+				// });
 			});
 	})
 
@@ -70,12 +70,12 @@ router
 						if (!comments) {
 							return res.send({ message: 'Sorry unable to get comments' });
 						}
-						// res.send({ blog, comments });
-						res.render('blog', {
-							title: blog.title,
-							blog,
-							comments
-						});
+						res.send({ blog, comments });
+						// res.render('blog', {
+						// 	title: blog.title,
+						// 	blog,
+						// 	comments
+						// });
 					}, next);
 			}, next);
 	})
@@ -107,12 +107,12 @@ router
 			}, next);
 	})
 
-// .GET for rendering addBlog page
-	.get('/addBlog', loginRequired, staffRequired, (req, res, next) => {
-		res.render('addBlog', {
-			title: 'Add A Blog'
-		});
-	})
+// // .GET for rendering addBlog page (ONLY FOR DEV)
+// 	.get('/addBlog', loginRequired, staffRequired, (req, res, next) => {
+// 		res.render('addBlog', {
+// 			title: 'Add A Blog'
+// 		});
+// 	})
 
 // Post for adding blogs by the Admin or Staff
 	.post('/addBlog',
@@ -168,8 +168,8 @@ router
 					}
 					newBlog.id = blogIds[0];
 					req.flash('success', 'Blog added.');
-					// res.send(newBlog);
-					res.redirect('blogs');
+					res.send(newBlog);
+					// res.redirect('blogs');
 				}, next);
 		})
 
@@ -216,8 +216,7 @@ router
 		})
 
 // Delete to delete blogs, Staff can only delete their own blogs and Admin can delete all.
-	// .delete('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
-	.get('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
+	.delete('/deleteBlog/:id/:createdBy', loginRequired, staffRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('blogs')
 			.where('id', id)
@@ -235,8 +234,8 @@ router
 							return res.send({ message: 'Sorry unable to delete comments' });
 						}
 					});
-				// res.sendStatus(200);
-				res.redirect('/api/blogs');
+				res.sendStatus(200);
+				// res.redirect('/api/blogs');
 			}, next);
 	});
 

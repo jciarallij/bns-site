@@ -3,22 +3,23 @@ const router = require('express').Router();
 const db = require('../db');
 
 function loginRequired(req, res, next) {
-	if (!req.isAuthenticated()) {
-		return res.redirect('/login');
-	}
+	console.log('Fake Authenticated');
+	// if (!req.isAuthenticated()) {
+	// 	return res.redirect('/login');
+	// }
 	next();
 }
 
 function staffRequired(req, res, next) {
 	if (!req.user.isStaff) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
 
 function adminRequired(req, res, next) {
 	if (!req.user.isAdmin) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
@@ -26,7 +27,7 @@ function adminRequired(req, res, next) {
 function authRequired(req, res, next) {
 	const { createdBy } = req.params || null;
 	if (!(req.user.userName === req.body.createdBy || createdBy) || !req.user.isStaff) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
@@ -90,7 +91,6 @@ router
 	.post('/addComment',
 			loginRequired,
 		(req, res, next) => {
-			console.log(req.body);
 // Form Validator
 			req.checkBody('blogId', 'Blog ID field is required').notEmpty();
 			req.checkBody('body', 'Body field is required').notEmpty();
@@ -117,8 +117,8 @@ router
 					}
 					newComment.id = comments[0];
 					req.flash('success', 'Comment added. Will need to be approved before visable.');
-					// res.send(newComment);
-					res.redirect(`/api/blog/${req.body.blogId}`);
+					res.send(newComment);
+					// res.redirect(`/api/blog/${req.body.blogId}`);
 				}, next);
 		})
 
@@ -164,8 +164,7 @@ router
 		})
 
 // .DELETE to delete comment by ID user can delete own comments and staff and delete all comments
-	// .delete('/deleteComment/:id/:createdBy', loginRequired, authRequired, (req, res, next) => {
-	.get('/deleteComment/:id/:createdBy', loginRequired, authRequired, (req, res, next) => {
+	.delete('/deleteComment/:id/:createdBy', loginRequired, authRequired, (req, res, next) => {
 		const { id } = req.params;
 		db('comments')
 			.where('id', id)

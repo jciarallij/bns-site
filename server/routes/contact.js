@@ -3,22 +3,23 @@ const router = require('express').Router();
 const db = require('../db');
 
 function loginRequired(req, res, next) {
-	if (!req.isAuthenticated()) {
-		return res.redirect('/login');
-	}
+	console.log('Fake Authenticated');
+	// if (!req.isAuthenticated()) {
+		// return res.redirect('/login');
+	// }
 	next();
 }
 
 function staffRequired(req, res, next) {
 	if (!req.user.isStaff) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
 
 function adminRequired(req, res, next) {
 	if (!req.user.isAdmin) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
@@ -26,13 +27,25 @@ function adminRequired(req, res, next) {
 function authRequired(req, res, next) {
 	const { createdBy } = req.params || null;
 	if (!(req.user.userName === req.body.createdBy || createdBy) || !req.user.isStaff) {
-		return res.render('403');
+		return res.sendStatus(403);
 	}
 	next();
 }
 
+
 router
-// .POST comment for a contact
+// .GET gets all contact requests
+	.get('/contacts', loginRequired, adminRequired, (req, res, next) => {
+		db('contacts')
+			.then(contacts => {
+				if (!contacts) {
+					return res.send({ message: 'Sorry unable to get contacts' });
+				}
+				res.send(contacts);
+			}, next);
+	})
+
+// .POST to add conatct request to db
 	.post('/contact',
 			loginRequired,
 		(req, res, next) => {
@@ -65,6 +78,21 @@ router
 					// res.send(newContact);
 					res.sendStatus(200);
 				}, next);
-		});
+		})
+
+	// .DELETE to delete contact
+	.delete('/deleteContact/:id', loginRequired, adminRequired, (req, res, next) => {
+		const { id } = req.params;
+		db('contacts')
+			.where('id', id)
+			.delete()
+			.then(result => {
+				if (result === 0) {
+					return res.send({ message: 'Sorry unable to delete contact' });
+				}
+				req.flash('success', 'Contact deleted.');
+				res.sendStatus(200);
+			}, next);
+	});
 
 module.exports = router;

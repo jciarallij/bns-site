@@ -6,8 +6,10 @@ const upload = multer({ dest: './uploads/profileImages' });
 
 function isLoggedIn(req, res, next) {
 	if (req.isAuthenticated()) {
-		return res.redirect('/blogs');
+		console.log('Authenticated!');
+		// return res.redirect('/blogs');
 	}
+	console.log('Not Authenticated');
 	next();
 }
 
@@ -22,23 +24,23 @@ router
 	})
 
 // .GET render login page (ONLY NEEDED IN DEV)
-	.get('/login', isLoggedIn, (req, res, next) => {
-		res.render('login');
-	})
+	// .get('/login', isLoggedIn, (req, res, next) => {
+	// 	res.render('login');
+	// })
 
 // .GET for logout and destroy the session
 	.get('/logout', (req, res, next) => {
 		req.session.destroy(err => {
 // TO-DO flash requires sessions so need to sort this out cuz session is destroyed
-			// req.flash('success', 'You have been logged out.');
-			res.redirect('login');
+			req.flash('success', 'You have been logged out.');
+			// res.redirect('login');
 		});
 	})
 
 // .GET render register page (ONLY NEEDED IN DEV)
-	.get('/register', isLoggedIn, (req, res, next) => {
-		res.render('register');
-	})
+	// .get('/register', isLoggedIn, (req, res, next) => {
+	// 	res.render('register');
+	// })
 
 // .POST for user login
 	.post('/login',
@@ -47,7 +49,8 @@ router
 		}),
 		(req, res) => {
 			req.flash('success', 'You are now logged in.');
-			res.redirect('blogs');
+			res.sendStatus(200);
+			// res.redirect('blogs');
 		}
 	)
 
@@ -58,7 +61,8 @@ router
 		}),
 			(req, res) => {
 				req.flash('success', 'You have successfully registered.');
-				res.redirect('blogs');
+				res.sendStatus(200);
+				// res.redirect('blogs');
 			}
 	);
 
