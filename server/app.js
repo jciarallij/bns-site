@@ -10,6 +10,7 @@ var expressValidator = require('express-validator');
 var expressMessages = require('express-messages');
 var multer = require('multer');
 var flash = require('connect-flash');
+var aws = require('aws-sdk');
 var db = require('./db');
 var cache = require('./cache');
 var upload = multer({ dest: './uploads' });

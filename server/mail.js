@@ -5,7 +5,7 @@ var aws = require('aws-sdk');
 aws.config.loadFromPath('config.js');
 
 // load AWS SES
-var ses = new aws.SES({apiVersion: '2010-12-01'});
+var ses = new aws.SES({ apiVersion: '2010-12-01' });
 
 // send to list
 var to = ['email@example.com']
@@ -20,9 +20,10 @@ ses.sendEmail( {
    Source: from, 
    Destination: { ToAddresses: to },
    Message: {
-       Subject:
+       Subject: {
         Source: {
           Data: 'A Message To You Rudy'
+        }
        },
        Body: {
            Text: {
@@ -34,5 +35,5 @@ ses.sendEmail( {
 , function(err, data) {
     if(err) throw err
         console.log('Email sent:');
-        console.log(data)console;
+        console.log(data);
  });
