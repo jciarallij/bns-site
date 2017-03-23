@@ -20,7 +20,8 @@ ses.sendEmail( {
    Source: from, 
    Destination: { ToAddresses: to },
    Message: {
-       Subject:Source {
+       Subject:
+        Source: {
           Data: 'A Message To You Rudy'
        },
        Body: {
