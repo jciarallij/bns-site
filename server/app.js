@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var passport = require('passport');
-var RedisStore = require('connect-redis')(session);
+// var RedisStore = require('connect-redis')(session);
 var expressValidator = require('express-validator');
 var expressMessages = require('express-messages');
 var multer = require('multer');
@@ -54,7 +54,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Handle sessions and cacheing
 app.use(session({
-	store: new RedisStore(),
+	// store: new RedisStore(),
 	secret: 'josh is awesome',
 	resave: false,
 	saveUninitialized: false

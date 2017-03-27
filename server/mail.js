@@ -16,23 +16,5 @@ const from = 'emailc@example.com';
 
 // this sends the email
 // @todo - add HTML version
-ses.sendEmail({
-	Source: from,
-	Destination: { ToAddresses: to },
-	Message: {
-		Subject: {
-			Source: {
-				Data: 'A Message To You Rudy'
-			}
-		},
-		Body: {
-			Text: {
-				Data: 'Stop your messing around',
-			}
-		}
-	}
-}, (err, data) => {
-	if (err) throw err;
-	console.log('Email sent:');
-	console.log(data);
-});
+
+module.exports = ses;

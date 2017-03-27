@@ -1,5 +1,6 @@
 const passport = require('passport');
 const router = require('express').Router();
+const ses = require('../mail');
 const db = require('../db');
 
 function loginRequired(req, res, next) {
@@ -47,7 +48,6 @@ router
 
 // .POST to add conatct request to db
 	.post('/contact',
-			loginRequired,
 		(req, res, next) => {
 // Form Validator
 			req.checkBody('email', 'Email field is required').notEmpty();
@@ -61,7 +61,7 @@ router
 			}
 
 			const newContact = {
-				createdBy: req.user.userName,
+				createdBy: req.body.name,
 				email: req.body.email,
 				phone: req.body.phone,
 				body: req.body.body
@@ -77,6 +77,26 @@ router
 					req.flash('success', 'Contact request sent.');
 					// res.send(newContact);
 					res.sendStatus(200);
+					ses.sendEmail({
+						Source: newContact.email,
+						Destination: { ToAddresses: 'tlobaugh@gmail.com' },
+						Message: {
+							Subject: {
+								Source: {
+									Data: `Contact request from website from ${newContact.createdBy} `
+								}
+							},
+							Body: {
+								Text: {
+									Data: `Phone: ${newContact.createdBy} | Message: ${newContact.body}`,
+								}
+							}
+						}
+					}, (err, data) => {
+						if (err) throw err;
+						console.log('Email sent:');
+						console.log(data);
+					});
 				}, next);
 		})
 
